@@ -52,6 +52,25 @@ button{font-family:inherit}
 .bv-slot.miss i{font-style:normal;font-size:26px;font-weight:800;opacity:.35;line-height:1}
 .bv-pager{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 0 calc(22px + env(safe-area-inset-bottom,0px));font-weight:800;font-variant-numeric:tabular-nums}
 
+.bv-edit{display:none;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;background:#00000024}
+.editing .bv-edit{display:flex}
+.bv-edit input{flex:1;min-width:0;height:40px;border-radius:12px;border:1px solid #ffffff40;background:#ffffff1f;color:inherit;font:700 16px Inter;padding:0 12px}
+.bv-arr{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;width:100%;order:3}
+.bv-arr::-webkit-scrollbar{display:none}
+.bv-chip{flex:none;height:34px;padding:0 14px;border-radius:999px;border:1px solid #ffffff59;background:#ffffff1f;color:inherit;font:700 13.5px Inter;cursor:pointer}
+.bv-chip:active{background:#ffffff40}
+.bv-hint{order:4;width:100%;margin:0;text-align:center;font-size:12.5px;font-weight:600;opacity:.75}
+.bv-done{height:40px;padding:0 18px;border-radius:999px;border:0;background:#fff;color:#16192b;font:800 15px Inter;cursor:pointer}
+.editing .bv-page{width:min(100%,calc((100dvh - 380px)*.715 + 16px))}
+.editing .bv-pagewrap.spread .bv-page{width:min(calc((100% - 40px)/2),calc((100dvh - 380px)*.715 + 16px))}
+.bv-pagewrap{overflow:hidden}
+.editing #editBtn{background:#fff;color:#16192b}
+.editing .bv-slot.has{cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;animation:wig .35s ease-in-out infinite alternate}
+.editing .bv-slot.has:nth-child(2n){animation-delay:-.17s}
+@keyframes wig{from{transform:rotate(-1.2deg)}to{transform:rotate(1.2deg)}}
+.bv-slot.hole{opacity:.25}
+.bv-slot.target{outline:3px solid #fff;outline-offset:2px;transform:scale(.94)!important;animation:none!important}
+.bv-drag{position:fixed!important;z-index:300;pointer-events:none;transform:scale(1.08) rotate(-2deg);box-shadow:0 18px 40px #00000080!important;margin:0}
 /* ---------- Effets (repris du PokéClasseur) ---------- */
 .fx{position:absolute;inset:0;pointer-events:none;border-radius:inherit;overflow:hidden}
 .fx:before,.fx:after,.glare{will-change:transform;transform:translate3d(calc((var(--mx,50%) - 50%) * .5),calc((var(--my,50%) - 50%) * .5),0)}
@@ -158,10 +177,22 @@ button{font-family:inherit}
 <body>
 <div class="bview" id="bview">
   <div class="bv-bar">
-    <h2>MantalyClasseur<small id="cnt"></small></h2>
+    <h2><span id="title">MantalyClasseur</span><small id="cnt"></small></h2>
     <div class="bv-tools">
+      <button class="bv-btn" id="editBtn" aria-label="Modifier le classeur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
       <button class="bv-btn" id="colorBtn" aria-label="Couleur du classeur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="10" r="1.3" fill="currentColor"/><path d="M12 21a3 3 0 0 1 0-6h1.5a2 2 0 0 0 0-4"/></svg></button>
     </div>
+  </div>
+  <div class="bv-edit" id="editbar">
+    <input id="titleIn" maxlength="40" aria-label="Nom du classeur" placeholder="Nom du classeur">
+    <div class="bv-arr">
+      <button class="bv-chip" data-sort="num">Par numéro</button>
+      <button class="bv-chip" data-sort="rare">Plus rares d'abord</button>
+      <button class="bv-chip" data-sort="type">Par type</button>
+      <button class="bv-chip" data-sort="rev">Inverser</button>
+    </div>
+    <p class="bv-hint" id="ehint">Glisse une carte sur une autre pour les échanger</p>
+    <button class="bv-done" id="doneBtn">Terminé</button>
   </div>
   <div class="bv-colors" id="colors"></div>
   <div class="bv-pagewrap" id="wrap"></div>
@@ -266,11 +297,17 @@ function tilt(el){
 }
 
 /* ---------- Classeur ---------- */
+const LS={get(k){try{return localStorage.getItem(k)}catch(_){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
+let ORDER=CARDS.map((_,i)=>i);
+try{const o=JSON.parse(LS.get('mantaly-order')||'null');if(Array.isArray(o)&&o.length===CARDS.length&&o.every(i=>CARDS[i]))ORDER=o}catch(_){}
+const saveOrder=()=>LS.set('mantaly-order',JSON.stringify(ORDER));
+const titleEl=$('#title'); const setTitle=t=>{t=(t||'').trim()||'MantalyClasseur';titleEl.textContent=t;document.title=t;LS.set('mantaly-title',t)};
+setTitle(LS.get('mantaly-title'));
 const wrap=$('#wrap'), plabel=$('#plabel');
 let spread=false, page=0;
-function slotHTML(n){
-  const c=CARDS.find(c=>c.n===n);
-  if(c) return `<button class="bv-slot has" data-i="${CARDS.indexOf(c)}" aria-label="${esc(c.name)}"><img src="${IMG[c.n-1]}" alt="" draggable="false"></button>`;
+function slotHTML(pos){
+  const c=CARDS[ORDER[pos-1]];
+  if(c) return `<button class="bv-slot has" data-p="${pos-1}" aria-label="${esc(c.name)}"><img src="${IMG[c.n-1]}" alt="" draggable="false"></button>`;
   return `<div class="bv-slot empty"></div>`;
 }
 function pageHTML(p,turn){
@@ -290,10 +327,10 @@ function render(dir){
 function turnPage(d){const step=spread?2:1,np=page+d*step;if(np<0||np>=PAGES)return;page=np;render(d)}
 $('#pprev').onclick=()=>turnPage(-1); $('#pnext').onclick=()=>turnPage(1);
 let sw=null;
-wrap.addEventListener('pointerdown',e=>{sw={x:e.clientX,y:e.clientY,t:Date.now()}});
-wrap.addEventListener('pointerup',e=>{if(!sw)return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;
+wrap.addEventListener('pointerdown',e=>{if(editing)return;sw={x:e.clientX,y:e.clientY,t:Date.now()}});
+wrap.addEventListener('pointerup',e=>{if(!sw||editing)return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;
   if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-sw.t<600){sw.moved=true;turnPage(dx<0?1:-1)} });
-wrap.addEventListener('click',e=>{if(sw&&sw.moved){sw=null;return}sw=null;const b=e.target.closest('.bv-slot.has');if(b)openCard(+b.dataset.i)});
+wrap.addEventListener('click',e=>{if(editing)return;if(sw&&sw.moved){sw=null;return}sw=null;const b=e.target.closest('.bv-slot.has');if(b)openCard(+b.dataset.p)});
 addEventListener('resize',()=>render(0));
 $('#cnt').textContent=`${CARDS.length} / ${TOTAL}`;
 
@@ -308,6 +345,52 @@ $('#colorBtn').onclick=()=>{colors.classList.toggle('show');render(0)};
 let saved=null;try{saved=localStorage.getItem('mantaly-color')}catch(_){}
 setColor(saved||COLORS[0]);
 render(0);
+
+/* ---------- Mode modification ---------- */
+let editing=false;
+const bview=$('#bview'), titleIn=$('#titleIn');
+function setEditing(on){editing=on;bview.classList.toggle('editing',on);
+  if(on){titleIn.value=titleEl.textContent;colors.classList.add('show')}else{setTitle(titleIn.value);colors.classList.remove('show')}
+  render(0)}
+$('#editBtn').onclick=()=>setEditing(!editing);
+$('#doneBtn').onclick=()=>setEditing(false);
+titleIn.addEventListener('input',()=>{titleEl.textContent=titleIn.value||'MantalyClasseur'});
+titleIn.addEventListener('keydown',e=>{if(e.key==='Enter')titleIn.blur()});
+titleIn.addEventListener('change',()=>setTitle(titleIn.value));
+const RANK=c=>c.rar.startsWith('★★')?4:c.rar.startsWith('★')?3:c.rar.startsWith('◆')?2:1;
+const TYPEO=c=>c.kind==='trainer'?'Z'+c.sub:(c.types||[]).join('');
+document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.sort;
+  if(k==='num')ORDER.sort((a,b)=>CARDS[a].n-CARDS[b].n);
+  if(k==='rare')ORDER.sort((a,b)=>RANK(CARDS[b])-RANK(CARDS[a])||CARDS[a].n-CARDS[b].n);
+  if(k==='type')ORDER.sort((a,b)=>TYPEO(CARDS[a]).localeCompare(TYPEO(CARDS[b]))||CARDS[a].n-CARDS[b].n);
+  if(k==='rev')ORDER.reverse();
+  saveOrder();render(0)});
+// glisser-échanger (appui long sur téléphone, direct à la souris)
+let drag=null;
+wrap.addEventListener('pointerdown',e=>{
+  if(!editing)return; const s=e.target.closest('.bv-slot.has'); if(!s)return;
+  const start={x:e.clientX,y:e.clientY}; e.preventDefault();
+  const begin=()=>{const r=s.getBoundingClientRect(); const g=s.cloneNode(true); g.classList.add('bv-drag');
+    Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
+    document.body.appendChild(g); s.classList.add('hole');
+    drag={from:+s.dataset.p,el:s,ghost:g,dx:start.x-r.left,dy:start.y-r.top,over:null};
+    navigator.vibrate&&navigator.vibrate(15)};
+  if(e.pointerType==='mouse')begin(); else{const t=setTimeout(begin,280);
+    const cancel=ev=>{if(!drag&&Math.hypot(ev.clientX-start.x,ev.clientY-start.y)>8){clearTimeout(t);off()}};
+    const up=()=>{clearTimeout(t);off()}; const off=()=>{removeEventListener('pointermove',cancel);removeEventListener('pointerup',up)};
+    addEventListener('pointermove',cancel);addEventListener('pointerup',up)}
+});
+addEventListener('pointermove',e=>{if(!drag)return;e.preventDefault();
+  drag.ghost.style.left=(e.clientX-drag.dx)+'px';drag.ghost.style.top=(e.clientY-drag.dy)+'px';
+  const t=document.elementFromPoint(e.clientX,e.clientY)?.closest('.bv-slot.has');
+  if(drag.over&&drag.over!==t)drag.over.classList.remove('target');
+  drag.over=t&&t!==drag.el?t:null; if(drag.over)drag.over.classList.add('target')},{passive:false});
+const endDrag=()=>{if(!drag)return;const d=drag;drag=null;d.ghost.remove();d.el.classList.remove('hole');
+  if(d.over){const to=+d.over.dataset.p;[ORDER[d.from],ORDER[to]]=[ORDER[to],ORDER[d.from]];saveOrder();render(0)}};
+addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
+wrap.addEventListener('touchmove',e=>{if(drag)e.preventDefault()},{passive:false});
+wrap.addEventListener('contextmenu',e=>{if(editing)e.preventDefault()});
 
 /* ---------- Fiche de la carte ---------- */
 function infoHTML(c){
@@ -331,7 +414,7 @@ function infoHTML(c){
 }
 let modal=null, stopTilt=()=>{}, cur=0;
 function fillSheet(i){
-  cur=(i+CARDS.length)%CARDS.length; const c=CARDS[cur];
+  cur=(i+CARDS.length)%CARDS.length; const c=CARDS[ORDER[cur]];
   stopTilt();
   modal.querySelector('.num').textContent=`${pad(c.n)} / ${pad(TOTAL)}`;
   modal.querySelector('.big').innerHTML=`<div class="holo" id="bigcard"><img src="${IMG[c.n-1]}" alt="${esc(c.name)}" draggable="false">${fxHTML(c)}</div>`;
