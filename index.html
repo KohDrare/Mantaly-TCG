@@ -33,6 +33,9 @@ button{font-family:inherit}
 .bv-colors{display:none;gap:10px;justify-content:center;padding:10px;background:#00000024}
 .bv-colors.show{display:flex}
 .bv-sw{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.5);cursor:pointer;padding:0;box-shadow:0 1px 4px #0000004d}
+.bview.has-img{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%),var(--bv-img) center/cover no-repeat,var(--bv-bg)}
+.bv-sw.img{background-size:cover!important;background-position:center!important;border-radius:10px;width:52px}
+.bv-sep{width:1px;align-self:stretch;background:#ffffff40;margin:0 4px}
 .bv-sw.on{outline:3px solid #fff;outline-offset:2px}
 .bv-pagewrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 10px 0;touch-action:pan-y}
 .bv-page{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,calc((100dvh - 210px)*.715 + 16px))}
@@ -341,9 +344,15 @@ $('#cnt').textContent=`${CARDS.length} / ${TOTAL}`;
 // couleur du classeur
 const COLORS=['#1f3a68','#2f6e78','#c2561c','#5b3a8c','#1d6b45','#8c1f32','#23262f'];
 const colors=$('#colors');
-function setColor(c){document.documentElement.style.setProperty('--bv-bg',c);document.querySelector('meta[name=theme-color]').content=c;
-  [...colors.children].forEach(b=>b.classList.toggle('on',b.dataset.c===c));try{localStorage.setItem('mantaly-color',c)}catch(_){}}
-colors.innerHTML=COLORS.map(c=>`<button class="bv-sw" data-c="${c}" style="background:${c}" aria-label="Couleur"></button>`).join('');
+const BGS=[{id:'salle',src:'bg-salle.jpg',mini:'bg-salle-mini.jpg',name:'Salle de basket'},{id:'terrain',src:'bg-terrain.jpg',mini:'bg-terrain-mini.jpg',name:'Terrain Mantaly'}];
+function setColor(c){
+  const bg=BGS.find(b=>b.id===c), bv=document.getElementById('bview');
+  if(bg){bv.style.setProperty('--bv-img',`url(${bg.src})`);bv.classList.add('has-img');document.documentElement.style.setProperty('--bv-bg','#12234f')}
+  else{bv.classList.remove('has-img');document.documentElement.style.setProperty('--bv-bg',c)}
+  document.querySelector('meta[name=theme-color]').content=bg?'#12234f':c;
+  [...colors.querySelectorAll('.bv-sw')].forEach(b=>b.classList.toggle('on',b.dataset.c===c));try{localStorage.setItem('mantaly-color',c)}catch(_){}}
+colors.innerHTML=BGS.map(b=>`<button class="bv-sw img" data-c="${b.id}" style="background-image:url(${b.mini})" aria-label="Fond ${b.name}"></button>`).join('')
+  +'<span class="bv-sep"></span>'+COLORS.map(c=>`<button class="bv-sw" data-c="${c}" style="background:${c}" aria-label="Couleur"></button>`).join('');
 colors.onclick=e=>{const b=e.target.closest('.bv-sw');if(b)setColor(b.dataset.c)};
 $('#colorBtn').onclick=()=>{colors.classList.toggle('show');render(0)};
 let saved=null;try{saved=localStorage.getItem('mantaly-color')}catch(_){}
