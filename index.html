@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1f3a68">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://kohdrare.github.io/Mantaly-TCG/apple-touch-icon.png?v=2">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Mantaly">
@@ -17,12 +17,12 @@
 <style>
 :root{--bv-bg:#1f3a68;--bv-ink:#fff;--mono:'JetBrains Mono',ui-monospace,monospace;--sheet:#15171f;--surface:#1d2029;--surface-2:#262a35;--muted:#9aa1b2}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,sans-serif}
+html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bv-bg)}
 body{overflow:hidden}
 button{font-family:inherit}
 
 /* ---------- Classeur (repris du PokéClasseur) ---------- */
-.bview{position:fixed;inset:0;background:var(--bv-bg);color:var(--bv-ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);transition:background .3s}
+.bview{position:fixed;inset:0;background:var(--bv-bg);color:var(--bv-ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transition:background .3s}
 .bv-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#00000024}
 .bv-bar h2{flex:1;margin:0;font-size:22px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bv-bar h2 small{font:700 12px var(--mono);opacity:.7;margin-left:8px}
@@ -54,7 +54,7 @@ button{font-family:inherit}
 .bv-slot.miss b{font:600 12px var(--mono);opacity:.75}
 .bv-slot.miss span{font-size:10.5px;font-weight:700;opacity:.6;line-height:1.2}
 .bv-slot.miss i{font-style:normal;font-size:26px;font-weight:800;opacity:.35;line-height:1}
-.bv-pager{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 0 calc(22px + env(safe-area-inset-bottom,0px));font-weight:800;font-variant-numeric:tabular-nums}
+.bv-pager{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 0 14px;font-weight:800;font-variant-numeric:tabular-nums}
 
 .bv-edit{display:none;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;background:#00000024}
 .editing .bv-edit{display:flex}
