@@ -34,8 +34,9 @@ button{font-family:inherit}
 .bv-colors{display:none;gap:10px;justify-content:center;padding:10px;background:#00000024}
 .bv-colors.show{display:flex}
 .bv-sw{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.5);cursor:pointer;padding:0;box-shadow:0 1px 4px #0000004d}
+.bgfill{position:fixed;top:0;left:0;right:0;height:calc(100lvh + env(safe-area-inset-bottom,0px) + 120px);z-index:-1;background:var(--bv-bg);pointer-events:none}
 html.has-img .bview{background:transparent}
-html.has-img{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%),var(--bv-img) center/cover no-repeat,var(--bv-bg)}
+html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%),var(--bv-img) center/cover no-repeat,var(--bv-bg)}
 .bv-sw.img{background-size:cover!important;background-position:center!important;border-radius:10px;width:52px}
 .bv-sep{width:1px;align-self:stretch;background:#ffffff40;margin:0 4px}
 .bv-sw.on{outline:3px solid #fff;outline-offset:2px}
@@ -184,6 +185,7 @@ html.has-img{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143
 </style>
 </head>
 <body>
+<div class="bgfill" aria-hidden="true"></div>
 <div class="bview" id="bview">
   <div class="bv-bar">
     <h2><span id="title">MantalyClasseur</span><small id="cnt"></small></h2>
