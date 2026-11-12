@@ -17,8 +17,9 @@
 <style>
 :root{--bv-bg:#1f3a68;--bv-ink:#fff;--mono:'JetBrains Mono',ui-monospace,monospace;--sheet:#15171f;--surface:#1d2029;--surface-2:#262a35;--muted:#9aa1b2}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bv-bg)}
-body{overflow:hidden}
+html,body{margin:0;height:100%;overscroll-behavior:none;font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bv-bg)}
+body{overflow:hidden;background:transparent}
+html{min-height:100%;background-attachment:scroll}
 button{font-family:inherit}
 
 /* ---------- Classeur (repris du PokéClasseur) ---------- */
@@ -33,7 +34,8 @@ button{font-family:inherit}
 .bv-colors{display:none;gap:10px;justify-content:center;padding:10px;background:#00000024}
 .bv-colors.show{display:flex}
 .bv-sw{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.5);cursor:pointer;padding:0;box-shadow:0 1px 4px #0000004d}
-.bview.has-img{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%),var(--bv-img) center/cover no-repeat,var(--bv-bg)}
+html.has-img .bview{background:transparent}
+html.has-img{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%),var(--bv-img) center/cover no-repeat,var(--bv-bg)}
 .bv-sw.img{background-size:cover!important;background-position:center!important;border-radius:10px;width:52px}
 .bv-sep{width:1px;align-self:stretch;background:#ffffff40;margin:0 4px}
 .bv-sw.on{outline:3px solid #fff;outline-offset:2px}
@@ -346,7 +348,7 @@ const COLORS=['#1f3a68','#2f6e78','#c2561c','#5b3a8c','#1d6b45','#8c1f32','#2326
 const colors=$('#colors');
 const BGS=[{id:'salle',src:'bg-salle.jpg',mini:'bg-salle-mini.jpg',name:'Salle de basket'},{id:'terrain',src:'bg-terrain.jpg',mini:'bg-terrain-mini.jpg',name:'Terrain Mantaly'}];
 function setColor(c){
-  const bg=BGS.find(b=>b.id===c), bv=document.getElementById('bview');
+  const bg=BGS.find(b=>b.id===c), bv=document.documentElement;
   if(bg){bv.style.setProperty('--bv-img',`url(${bg.src})`);bv.classList.add('has-img');document.documentElement.style.setProperty('--bv-bg','#12234f')}
   else{bv.classList.remove('has-img');document.documentElement.style.setProperty('--bv-bg',c)}
   document.querySelector('meta[name=theme-color]').content=bg?'#12234f':c;
