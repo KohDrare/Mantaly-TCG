@@ -81,6 +81,37 @@ html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30
 .bv-slot.hole{opacity:.25}
 .bv-slot.target{outline:3px solid #fff;outline-offset:2px;transform:scale(.94)!important;animation:none!important}
 .bv-drag{position:fixed!important;z-index:300;pointer-events:none;transform:scale(1.08) rotate(-2deg);box-shadow:0 18px 40px #00000080!important;margin:0}
+/* ---------- Intro : classeur fermé qui s'ouvre au scroll ---------- */
+#intro{position:fixed;inset:0;z-index:500;background:radial-gradient(120% 80% at 50% 40%,#1c2f63 0%,#0b1430 70%,#060b1c 100%);color:#fff}
+#intro .in-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;z-index:2;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#intro .in-scroll::-webkit-scrollbar{display:none}
+#intro .in-spacer{height:420vh}
+#intro .in-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1800px;z-index:1;pointer-events:none}
+.in-binder{--w:min(78vw,calc(64dvh*.74));position:relative;width:var(--w);aspect-ratio:.74;perspective:1600px;perspective-origin:30% 50%;will-change:transform}
+.in-page,.in-cover,.in-face{position:absolute;inset:0;border-radius:3% 5% 5% 3%/2.2% 3.6% 3.6% 2.2%}
+.in-page{z-index:1;background:linear-gradient(160deg,#1f3a68,#152a50);box-shadow:0 30px 80px #000a,inset 0 0 0 2px #ffffff14;padding:7% 6% 7% 9%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3.5%}
+.in-page i{opacity:var(--co,0);display:block;border-radius:5%/3.6%;background:#ffffff14 center/cover no-repeat;box-shadow:0 3px 8px #0006,inset 0 0 0 1px #ffffff1f}
+.in-cover{z-index:2;transform-origin:left center;transform-style:preserve-3d;will-change:transform}
+.in-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.in-front{background:
+  radial-gradient(120% 90% at 30% 20%,#2a4c8f 0%,#163066 45%,#0d1d45 100%);
+  box-shadow:0 40px 90px #000c,inset 0 0 0 2px #ffffff1a,inset 0 0 60px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4%}
+.in-front:before{content:"";position:absolute;inset:3.2%;border:2px dashed #ff9a3c88;border-radius:2.4%/1.8%;pointer-events:none}
+.in-front:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,#ffffff06 0 2px,transparent 2px 6px),linear-gradient(115deg,transparent 35%,#ffffff1c 48%,transparent 60%);background-size:auto,250% 100%;background-position:0 0,var(--sh,100%) 0;pointer-events:none}
+.in-spine{position:absolute;left:0;top:0;bottom:0;width:9%;background:linear-gradient(90deg,#08112e,#1a3266 60%,#0c1a40);box-shadow:inset -3px 0 6px #0008}
+.in-badge{width:62%;aspect-ratio:1;background:url(badge.png) center/contain no-repeat;filter:drop-shadow(0 10px 18px #000a);margin-left:7%}
+.in-title{margin-left:7%;text-align:center;font:900 clamp(16px,calc(var(--w)*.085),44px)/1 Inter;letter-spacing:.04em;background:linear-gradient(180deg,#fff07a,#ffc21f 50%,#ff8a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #12296a) drop-shadow(0 0 1px #12296a)}
+.in-title small{display:block;font-size:.5em;letter-spacing:.3em;margin-bottom:.25em}
+.in-strap{position:absolute;right:-1.5%;top:50%;width:13%;height:12%;transform:translateY(-50%);border-radius:6px 0 0 6px;background:linear-gradient(180deg,#ff9a3c,#d9661a);box-shadow:0 4px 10px #0007,inset 0 0 0 2px #ffffff33}
+.in-strap:after{content:"";position:absolute;left:22%;top:30%;width:28%;height:40%;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#c9ced9 50%,#7d869c)}
+.in-back{transform:rotateY(180deg);background:linear-gradient(200deg,#1a3266,#0d1d45);box-shadow:inset 0 0 0 2px #ffffff14,inset -20px 0 40px #0006}
+.in-back:after{content:"MANTALY PARTY · ÉDITION GUILLAUME";position:absolute;left:0;right:0;bottom:8%;text-align:center;font:700 clamp(8px,calc(var(--w)*.03),13px) 'JetBrains Mono',monospace;letter-spacing:.2em;color:#ffffff59}
+.in-hint{position:absolute;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;font:700 14px Inter;letter-spacing:.06em;opacity:.85;z-index:1;pointer-events:none}
+.in-hint b{display:block;font-size:22px;margin-top:6px;animation:inb 1.4s ease-in-out infinite}
+@keyframes inb{50%{transform:translateY(7px)}}
+.in-skip{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:3;height:36px;padding:0 16px;border-radius:999px;border:1px solid #ffffff40;background:#ffffff1a;color:#fff;font:700 13px Inter;cursor:pointer;backdrop-filter:blur(6px)}
+.bview.pre{opacity:0;transform:scale(.94)}
+.bview{transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1)}
 /* ---------- Effets (façon CarlosClasseur) ---------- */
 /* Couches : carte → reflet holo → paillettes → reflet de lumière. tilt() pose --mx/--my, --px/--py (-1..1), --hyp (0 à plat → 1 penché) */
 .holo,.vw-card{--hyp:0;--px:0;--py:0}
@@ -172,7 +203,19 @@ html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30
 </head>
 <body>
 <div class="bgfill" aria-hidden="true"></div>
-<div class="bview" id="bview">
+<div id="intro" aria-label="Intro">
+  <div class="in-stage"><div class="in-binder" id="inBinder">
+    <div class="in-page" id="inPage"></div>
+    <div class="in-cover" id="inCover">
+      <div class="in-face in-front"><div class="in-spine"></div><div class="in-badge"></div><div class="in-title"><small>ÉDITION</small>GUILLAUME</div><div class="in-strap"></div></div>
+      <div class="in-face in-back"></div>
+    </div>
+  </div></div>
+  <div class="in-hint" id="inHint">Fais défiler pour ouvrir<b>↓</b></div>
+  <div class="in-scroll" id="inScroll"><div class="in-spacer"></div></div>
+  <button class="in-skip" id="inSkip">Passer</button>
+</div>
+<div class="bview pre" id="bview">
   <div class="bv-bar">
     <h2><span id="title">MantalyClasseur</span><small id="cnt"></small></h2>
     <div class="bv-tools">
@@ -349,6 +392,34 @@ $('#colorBtn').onclick=()=>{colors.classList.toggle('show');render(0)};
 let saved=null;try{saved=localStorage.getItem('mantaly-color')}catch(_){}
 setColor(saved||COLORS[0]);
 render(0);
+
+/* ---------- Intro ---------- */
+(function(){
+  const intro=$('#intro'); if(!intro)return;
+  const page=$('#inPage'), sc=$('#inScroll'), binder=$('#inBinder'), cover=$('#inCover'), hint=$('#inHint'), bv=$('#bview');
+  $('#inPage').innerHTML=Array.from({length:9},(_,i)=>{const c=CARDS[ORDER[i]];return `<i style="${c?`background-image:url(${IMG[c.n-1]})`:''}"></i>`}).join('');
+  const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  let raf=0, done=false;
+  function finish(){if(done)return;done=true;bv.classList.remove('pre');intro.style.transition='opacity .45s';intro.style.opacity=0;setTimeout(()=>intro.remove(),480)}
+  function frame(){raf=0;
+    const max=sc.scrollHeight-sc.clientHeight, p=max>0?sc.scrollTop/max:0;
+    const t1=ease(cl((p-.04)/.5)), t2=ease(cl((p-.62)/.33));
+    const w=binder.offsetWidth, fit=Math.min(1,.94*innerWidth/(2*w));
+    const s=(1-(1-fit)*t1)*(1+t2*1.6), x=w*.5*t1*(1-t2)*s;
+    binder.style.transform=`translateX(${x}px) scale(${s})`;
+    cover.style.transform=`rotateY(${-178*t1}deg)`;
+    cover.style.setProperty('--sh',(100-p*400)+'%');
+    binder.style.opacity=1-t2;
+    page.style.setProperty('--co',cl((t1-.42)/.18));
+    hint.style.opacity=cl(1-p*6)*.85;
+    if(t2>.35)bv.classList.remove('pre'); else bv.classList.add('pre');
+    if(p>.985)finish();
+  }
+  sc.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(frame)},{passive:true});
+  $('#inSkip').onclick=finish;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)finish();
+  frame();
+})();
 
 /* ---------- Mode modification ---------- */
 let editing=false;
