@@ -82,7 +82,9 @@ html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30
 .bv-slot.target{outline:3px solid #fff;outline-offset:2px;transform:scale(.94)!important;animation:none!important}
 .bv-drag{position:fixed!important;z-index:300;pointer-events:none;transform:scale(1.08) rotate(-2deg);box-shadow:0 18px 40px #00000080!important;margin:0}
 /* ---------- Intro : classeur fermé qui s'ouvre au scroll ---------- */
-#intro{position:fixed;inset:0;z-index:500;background:radial-gradient(120% 80% at 50% 40%,#1c2f63 0%,#0b1430 70%,#060b1c 100%);color:#fff}
+#intro{position:fixed;inset:0;z-index:500;background:#0b1430;color:#fff}
+#inBg{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+#intro .in-veil{position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30%,#0b143055 70%,#0b1430cc 100%)}
 #intro .in-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;z-index:2;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #intro .in-scroll::-webkit-scrollbar{display:none}
 #intro .in-spacer{height:340vh}
@@ -204,6 +206,7 @@ html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30
 <body>
 <div class="bgfill" aria-hidden="true"></div>
 <div id="intro" aria-label="Intro">
+  <canvas id="inBg"></canvas><div class="in-veil"></div>
   <div class="in-stage"><div class="in-binder" id="inBinder">
     <div class="in-page" id="inPage"></div>
     <div class="in-cover" id="inCover">
@@ -378,7 +381,7 @@ $('#cnt').textContent=`${CARDS.length} / ${TOTAL}`;
 // couleur du classeur
 const COLORS=['#1f3a68','#2f6e78','#c2561c','#5b3a8c','#1d6b45','#8c1f32','#23262f'];
 const colors=$('#colors');
-const BGS=[{id:'salle',src:'bg-salle.jpg',mini:'bg-salle-mini.jpg',name:'Salle de basket'},{id:'terrain',src:'bg-terrain.jpg',mini:'bg-terrain-mini.jpg',name:'Terrain Mantaly'}];
+const BGS=[{id:'arene',src:'frames/f190.jpg',mini:'bg-arene-mini.jpg',name:'Arène Mantaly'},{id:'salle',src:'bg-salle.jpg',mini:'bg-salle-mini.jpg',name:'Salle de basket'},{id:'terrain',src:'bg-terrain.jpg',mini:'bg-terrain-mini.jpg',name:'Terrain Mantaly'}];
 function setColor(c){
   const bg=BGS.find(b=>b.id===c), bv=document.documentElement;
   if(bg){bv.style.setProperty('--bv-img',`url(${bg.src})`);bv.classList.add('has-img');document.documentElement.style.setProperty('--bv-bg','#12234f')}
@@ -390,7 +393,7 @@ colors.innerHTML=BGS.map(b=>`<button class="bv-sw img" data-c="${b.id}" style="b
 colors.onclick=e=>{const b=e.target.closest('.bv-sw');if(b)setColor(b.dataset.c)};
 $('#colorBtn').onclick=()=>{colors.classList.toggle('show');render(0)};
 let saved=null;try{saved=localStorage.getItem('mantaly-color')}catch(_){}
-setColor(saved||COLORS[0]);
+setColor(saved||'arene');
 render(0);
 
 /* ---------- Intro ---------- */
@@ -399,11 +402,20 @@ render(0);
   const page=$('#inPage'), sc=$('#inScroll'), binder=$('#inBinder'), cover=$('#inCover'), hint=$('#inHint'), bv=$('#bview');
   $('#inPage').innerHTML=Array.from({length:9},(_,i)=>{const c=CARDS[ORDER[i]];return `<i style="${c?`background-image:url(${IMG[c.n-1]})`:''}"></i>`}).join('');
   const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  const cv=$('#inBg'), cx=cv.getContext('2d'), NF=190, fr=new Array(NF), ok=new Array(NF).fill(false); let last=-1;
+  function ld(i){const im=new Image();im.decoding='async';im.onload=()=>{ok[i]=true;if(!raf)raf=requestAnimationFrame(frame)};im.src='frames/f'+String(i+1).padStart(3,'0')+'.jpg';fr[i]=im}
+  ld(0);ld(NF-1);for(let st=16;st>=1;st>>=1)for(let i=0;i<NF;i+=st)if(!fr[i])ld(i);
+  function size(){const d=Math.min(devicePixelRatio,2);cv.width=Math.round(innerWidth*d);cv.height=Math.round(innerHeight*d);last=-1}
+  size();addEventListener('resize',()=>{size();frame()});
+  function drawBg(fi){let i=fi;if(!ok[i]){let b=-1;for(let d=1;d<NF;d++){if(i-d>=0&&ok[i-d]){b=i-d;break}if(i+d<NF&&ok[i+d]){b=i+d;break}}if(b<0)return;i=b}
+    if(i===last)return;const im=fr[i],W=cv.width,H=cv.height,s=Math.max(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
+    cx.drawImage(im,(W-w)/2,(H-h)/2,w,h);last=i}
   let raf=0, done=false;
   function finish(){if(done)return;done=true;bv.classList.remove('pre');intro.style.transition='opacity .45s';intro.style.opacity=0;setTimeout(()=>intro.remove(),480)}
   function frame(){raf=0;
     const max=sc.scrollHeight-sc.clientHeight, p=max>0?sc.scrollTop/max:0;
     const t1=ease(cl((p-.04)/.5)), t2=ease(cl((p-.66)/.16));
+    drawBg(Math.round(cl(p/.8)*(NF-1)));
     const w=binder.offsetWidth, fit=Math.min(1,.94*innerWidth/(2*w));
     const s=(1-(1-fit)*t1)*(1+t2*.35), x=w*.5*t1*(1-t2)*s;
     binder.style.transform=`translateX(${x}px) scale(${s})`;
