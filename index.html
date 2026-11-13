@@ -85,7 +85,7 @@ html.has-img .bgfill{background:linear-gradient(180deg,#0b1430cc 0%,#0b143066 30
 #intro{position:fixed;inset:0;z-index:500;background:radial-gradient(120% 80% at 50% 40%,#1c2f63 0%,#0b1430 70%,#060b1c 100%);color:#fff}
 #intro .in-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;z-index:2;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #intro .in-scroll::-webkit-scrollbar{display:none}
-#intro .in-spacer{height:420vh}
+#intro .in-spacer{height:340vh}
 #intro .in-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1800px;z-index:1;pointer-events:none}
 .in-binder{--w:min(78vw,calc(64dvh*.74));position:relative;width:var(--w);aspect-ratio:.74;perspective:1600px;perspective-origin:30% 50%;will-change:transform}
 .in-page,.in-cover,.in-face{position:absolute;inset:0;border-radius:3% 5% 5% 3%/2.2% 3.6% 3.6% 2.2%}
@@ -403,9 +403,9 @@ render(0);
   function finish(){if(done)return;done=true;bv.classList.remove('pre');intro.style.transition='opacity .45s';intro.style.opacity=0;setTimeout(()=>intro.remove(),480)}
   function frame(){raf=0;
     const max=sc.scrollHeight-sc.clientHeight, p=max>0?sc.scrollTop/max:0;
-    const t1=ease(cl((p-.04)/.5)), t2=ease(cl((p-.62)/.33));
+    const t1=ease(cl((p-.04)/.5)), t2=ease(cl((p-.66)/.16));
     const w=binder.offsetWidth, fit=Math.min(1,.94*innerWidth/(2*w));
-    const s=(1-(1-fit)*t1)*(1+t2*1.6), x=w*.5*t1*(1-t2)*s;
+    const s=(1-(1-fit)*t1)*(1+t2*.35), x=w*.5*t1*(1-t2)*s;
     binder.style.transform=`translateX(${x}px) scale(${s})`;
     cover.style.transform=`rotateY(${-178*t1}deg)`;
     cover.style.setProperty('--sh',(100-p*400)+'%');
@@ -413,7 +413,7 @@ render(0);
     page.style.setProperty('--co',cl((t1-.42)/.18));
     hint.style.opacity=cl(1-p*6)*.85;
     if(t2>.35)bv.classList.remove('pre'); else bv.classList.add('pre');
-    if(p>.985)finish();
+    if(t2>=.999)finish();
   }
   sc.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(frame)},{passive:true});
   $('#inSkip').onclick=finish;
