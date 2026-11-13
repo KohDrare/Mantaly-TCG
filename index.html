@@ -411,8 +411,8 @@ render(0);
     if(i===last)return;const im=fr[i],W=cv.width,H=cv.height,s=Math.max(W/im.naturalWidth,H/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;
     cx.drawImage(im,(W-w)/2,(H-h)/2,w,h);last=i}
   let raf=0, done=false;
-  function finish(){if(done)return;done=true;bv.classList.remove('pre');intro.style.transition='opacity .45s';intro.style.opacity=0;setTimeout(()=>intro.remove(),480)}
-  function frame(){raf=0;
+  function finish(){if(done)return;done=true;cancelAnimationFrame(raf);bv.classList.remove('pre');sc.style.pointerEvents='none';intro.style.pointerEvents='none';intro.style.transition='opacity .45s';intro.style.opacity=0;setTimeout(()=>intro.remove(),480)}
+  function frame(){raf=0;if(done)return;
     const max=sc.scrollHeight-sc.clientHeight, p=max>0?sc.scrollTop/max:0;
     const t1=ease(cl((p-.04)/.5)), t2=ease(cl((p-.66)/.16));
     drawBg(Math.round(cl(p/.8)*(NF-1)));
